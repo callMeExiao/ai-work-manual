@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentCard from '../../components/ContentCard.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import { getCollection } from 'astro:content';
+import { isVisible } from '../../lib/content';
+
+const allEntries = await getCollection('components', isVisible);
+const activeTag = Astro.url.searchParams.get('tag') ?? '';
+const activeStatus = Astro.url.searchParams.get('status') ?? '';
+const entries = [...allEntries].sort((a, b) => b.data.updatedAt.valueOf() - a.data.updatedAt.valueOf());
+const tags = [...new Set(allEntries.flatMap((entry) => entry.data.tags))].sort();
+const statuses = [...new Set(allEntries.map((entry) => entry.data.status))];
+---
+<BaseLayout title="组件库" description="值得收藏的界面组件，记录来源、适用场景和实现观察。">
+  <div class="listing-page page-frame component-listing-page">
+    <section class="listing-hero"><div><p class="eyebrow">02 / WHAT I KEEP</p><h1>组件库</h1></div><p>先看它如何工作，再决定它是否值得带回自己的界面。</p></section>
+    <div class="listing-summary"><span>{String(entries.length).padStart(2, '0')} 个组件</span><span>真实预览 · 个人观察</span></div>
+    <FilterBar type="component" tags={tags} statuses={statuses} activeTag={activeTag} activeStatus={activeStatus} />
+    {entries.length ? <div class="component-list-grid">{entries.map((entry) => <ContentCard entry={entry} type="component" />)}</div> : <div class="empty-state"><span>∅</span><h2>没有匹配的组件</h2><p>换一个主题或状态，继续翻找。</p></div>}
+    <div class="empty-state filtered-empty-state" data-filter-empty hidden><span>∅</span><h2>没有匹配的组件</h2><p>换一个主题或状态，继续翻找。</p></div>
+  </div>
+</BaseLayout>

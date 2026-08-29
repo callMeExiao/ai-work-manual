@@ -1,0 +1,29 @@
+---
+interface Props {
+  preview: 'command' | 'table' | 'empty' | 'editor';
+}
+const { preview } = Astro.props;
+---
+<div class:list={["component-preview", `preview-${preview}`]} aria-label="组件预览">
+  {preview === 'command' && (
+    <div class="preview-command-window">
+      <div class="preview-command-search"><span>⌕</span><span>搜索工作手册…</span><kbd>⌘ K</kbd></div>
+      <div class="preview-command-group"><small>导航</small><div class="preview-command-row selected"><span>↗</span>工作流</div><div class="preview-command-row"><span>□</span>组件库</div><div class="preview-command-row"><span>▤</span>文章</div></div>
+    </div>
+  )}
+  {preview === 'table' && (
+    <table class="preview-table-window">
+      <caption class="sr-only">组件条目预览</caption>
+      <thead><tr class="preview-table-head"><th scope="col">条目</th><th scope="col">状态</th><th scope="col">更新</th></tr></thead>
+      <tbody>
+        {['研究文章', 'Prompt 验证', '组件整理'].map((row, index) => <tr class="preview-table-row"><th scope="row"><i class:list={["table-dot", `dot-${index}`]}></i>{row}</th><td>{index === 1 ? '实验中' : '使用中'}</td><td>08/{28 - index}</td></tr>)}
+      </tbody>
+    </table>
+  )}
+  {preview === 'empty' && (
+    <div class="preview-empty-window"><span class="empty-mark">∅</span><strong>还没有保存的条目</strong><small>换一个关键词试试</small><button type="button">清除筛选</button></div>
+  )}
+  {preview === 'editor' && (
+    <div class="preview-editor-window"><div class="editor-bar"><span></span><span></span><span></span></div><div class="editor-line"><i>01</i><b>#</b> 研究笔记</div><div class="editor-line"><i>02</i><b>-</b> 先看结构，再看细节</div><div class="editor-line faded"><i>03</i><b>-</b> 留下可复用的判断</div></div>
+  )}
+</div>

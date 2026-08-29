@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title>要有 AI，不要重复劳动</title>
+  <desc>深红色纸页印章</desc>
+  <rect width="64" height="64" rx="8" fill="#efe4c9"/>
+  <path d="M16 15h32v34H16z" fill="none" stroke="#9a3027" stroke-width="3"/>
+  <path d="M23 23h18M23 31h18M23 39h11" fill="none" stroke="#9a3027" stroke-width="3" stroke-linecap="round"/>
+</svg>

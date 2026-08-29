@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentList from '../../components/ContentList.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import { getCollection } from 'astro:content';
+import { isVisible } from '../../lib/content';
+
+const allEntries = await getCollection('workflows', isVisible);
+const activeTag = Astro.url.searchParams.get('tag') ?? '';
+const activeStatus = Astro.url.searchParams.get('status') ?? '';
+const entries = [...allEntries].sort((a, b) => b.data.updatedAt.valueOf() - a.data.updatedAt.valueOf());
+const tags = [...new Set(allEntries.flatMap((entry) => entry.data.tags))].sort();
+const statuses = [...new Set(allEntries.map((entry) => entry.data.status))];
+---
+<BaseLayout title="工作流" description="可执行的工作流与 Prompt，记录输入、步骤、输出和验证。">
+  <div class="listing-page page-frame">
+    <section class="listing-hero"><div><p class="eyebrow">01 / HOW I WORK</p><h1>工作流</h1></div><p>把一次有效的尝试，整理成下一次可以重新执行的步骤。</p></section>
+    <div class="listing-summary"><span>{String(entries.length).padStart(2, '0')} 条记录</span><span>按最近修订排序</span></div>
+    <FilterBar type="workflow" tags={tags} statuses={statuses} activeTag={activeTag} activeStatus={activeStatus} />
+    {entries.length ? <ContentList entries={entries} type="workflow" /> : <div class="empty-state"><span>∅</span><h2>没有匹配的工作流</h2><p>换一个主题或状态，继续翻找。</p></div>}
+    <div class="empty-state filtered-empty-state" data-filter-empty hidden><span>∅</span><h2>没有匹配的工作流</h2><p>换一个主题或状态，继续翻找。</p></div>
+  </div>
+</BaseLayout>

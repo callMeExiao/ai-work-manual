@@ -1,0 +1,28 @@
+---
+import TagList from './TagList.astro';
+import StatusTag from './StatusTag.astro';
+import { formatDate, href } from '../lib/content';
+
+interface Props {
+  entries: any[];
+  type: 'workflow' | 'component' | 'article';
+}
+const { entries, type } = Astro.props;
+---
+<div class:list={["content-list", `list-${type}`]}>
+  {entries.map((entry) => {
+    const data = entry.data;
+    const path = type === 'workflow' ? `/workflows/${entry.slug}/` : type === 'component' ? `/components/${entry.slug}/` : `/articles/${entry.slug}/`;
+    return (
+      <article class="list-row" data-filter-item data-filter-tags={data.tags.join('|')} data-filter-status={type === 'article' ? data.readingStatus : data.status}>        <div class="list-row-number">{String(entries.indexOf(entry) + 1).padStart(2, '0')}</div>
+        <div class="list-row-main">
+          <div class="list-row-heading"><span class="list-kicker">{type === 'workflow' ? 'WORKFLOW' : type === 'component' ? 'COMPONENT' : 'ARTICLE'}</span><StatusTag status={type === 'article' ? data.readingStatus : data.status} type={type} /></div>
+          <h3><a href={href(path)}>{data.title}</a></h3>
+          <p>{data.description}</p>
+          <div class="list-row-meta"><TagList tags={data.tags} />{type === 'workflow' && <span>最后验证 {formatDate(data.lastVerified)}</span>}{type === 'component' && <span>{data.technology.join(' / ')}</span>}{type === 'article' && <span>{data.author} · {data.source}</span>}</div>
+        </div>
+        <a class="row-arrow" href={href(path)} aria-label={`查看${data.title}`}>↗</a>
+      </article>
+    );
+  })}
+</div>

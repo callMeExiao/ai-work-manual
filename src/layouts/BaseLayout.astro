@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SearchDialog from '../components/SearchDialog.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  currentPath?: string;
+}
+
+const { title, description = '一份持续更新的个人工作手册，记录我如何在 AI 时代工作、思考与创造。', currentPath = Astro.url.pathname } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const assetBase = base.endsWith('/') ? base : `${base}/`;
+---
+<!doctype html>
+<html lang="zh-CN" data-base={base}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={`${assetBase}favicon.svg`} />
+    <title>{title} · 要有 AI，不要重复劳动</title>
+  </head>
+  <body>
+    <div class="paper-shell">
+      <SiteHeader currentPath={currentPath} />
+      <main id="main-content">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <div class="footer-rule"></div>
+        <div class="footer-row">
+          <span>要有 AI，不要重复劳动 / BUILD WORKFLOWS, NOT GRIND</span>
+          <span>持续修订中 · {new Date().getFullYear()}</span>
+        </div>
+      </footer>
+    </div>
+    <SearchDialog />
+  </body>
+</html>

@@ -1,0 +1,27 @@
+---
+import { href } from '../lib/content';
+
+interface Props {
+  related: { workflows?: string[]; components?: string[]; articles?: string[] };
+}
+const { related } = Astro.props;
+const groups = [
+  { key: 'workflows', label: '工作流', base: '/workflows/' },
+  { key: 'components', label: '组件库', base: '/components/' },
+  { key: 'articles', label: '文章', base: '/articles/' },
+] as const;
+---
+{groups.some(({ key }) => related?.[key]?.length) && (
+  <section class="related-section" aria-labelledby="related-title">
+    <div class="section-label"><span>关联内容</span><span>RELATED / 03</span></div>
+    <h2 id="related-title">从这里继续</h2>
+    <div class="related-grid">
+      {groups.map(({ key, label, base }) => related?.[key]?.length ? (
+        <div class="related-group">
+          <h3>{label}</h3>
+          {related[key]?.map((slug) => <a href={href(`${base}${slug}/`)}>{slug.replaceAll('-', ' ') } <span aria-hidden="true">↗</span></a>)}
+        </div>
+      ) : null)}
+    </div>
+  </section>
+)}

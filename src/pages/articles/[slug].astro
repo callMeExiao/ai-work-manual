@@ -1,0 +1,41 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StatusTag from '../../components/StatusTag.astro';
+import TagList from '../../components/TagList.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import HarnessDiagram from '../../components/HarnessDiagram.astro';
+import { formatDate, href } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('articles', (entry) => import.meta.env.DEV || !entry.data.draft);
+  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const data = entry.data;
+---
+<BaseLayout title={data.title} description={data.description}>
+  <div class="detail-page page-frame article-detail">
+    <a class="back-link" href={href('/articles/')}>← 返回文章索引</a>
+    <header class="detail-header article-header">
+      <div class="detail-overline"><span>ARTICLE / {entry.id.slice(0, 2).toUpperCase()}</span><StatusTag status={data.readingStatus} type="article" /></div>
+      <h1>{data.title}</h1>
+      <p class="detail-lede">{data.description}</p>
+      <div class="article-source-line"><span>{data.author}</span><span>{data.source}</span><span>发布于 {formatDate(data.publishedAt)}</span><a href={data.url} target="_blank" rel="noreferrer">阅读原文 ↗</a></div>
+    </header>
+    <div class="article-layout">
+      <aside class="article-aside">
+        <section class="sidebar-note"><span class="sidebar-label">关键观点</span><ul class="key-points">{data.keyPoints.map((point) => <li>{point}</li>)}</ul></section>
+        <section class="sidebar-note judgment-note"><span class="sidebar-label">我的判断</span><p>{data.personalJudgment}</p></section>
+        <section class="sidebar-note"><span class="sidebar-label">标签</span><div class="sidebar-tags"><TagList tags={data.tags} /></div></section>
+      </aside>
+      <article class="article-body">
+        {data.diagram && data.diagram.kind === 'harness-loop' && <HarnessDiagram alt={data.diagram.alt} caption={data.diagram.caption} source={data.diagram.source} />}
+        <div class="prose"><Content /></div>
+      </article>
+    </div>
+    <RelatedContent related={data.related} />
+  </div>
+</BaseLayout>

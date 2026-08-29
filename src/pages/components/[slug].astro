@@ -1,0 +1,48 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StatusTag from '../../components/StatusTag.astro';
+import TagList from '../../components/TagList.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import ComponentPreview from '../../components/ComponentPreview.astro';
+import { formatDate, href } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('components', (entry) => import.meta.env.DEV || !entry.data.draft);
+  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const data = entry.data;
+---
+<BaseLayout title={data.title} description={data.description}>
+  <div class="detail-page page-frame component-detail">
+    <a class="back-link" href={href('/components/')}>← 返回组件库</a>
+    <header class="detail-header">
+      <div class="detail-overline"><span>COMPONENT / {entry.id.slice(0, 2).toUpperCase()}</span><StatusTag status={data.status} type="component" /></div>
+      <h1>{data.title}</h1>
+      <p class="detail-lede">{data.description}</p>
+      <div class="detail-meta-grid">
+        <div><span>类别</span><strong>{data.category}</strong></div>
+        <div><span>技术栈</span><strong>{data.technology.join(' · ')}</strong></div>
+        <div><span>最近修订</span><strong>{formatDate(data.updatedAt)}</strong></div>
+        <div><span>实践状态</span><strong>{data.used ? '已在实践中' : '等待试用'}</strong></div>
+      </div>
+    </header>
+
+    <section class="component-detail-preview"><div class="section-label"><span>实时观察</span><span>PREVIEW / 01</span></div><ComponentPreview preview={data.preview} /></section>
+    <div class="detail-content-grid">
+      <div class="detail-main">
+        <section class="prose-section"><div class="section-label"><span>为什么留下</span><span>REASON / 02</span></div><h2>{data.reason}</h2><div class="component-facts"><div><span>适用场景</span><div class="sidebar-tags"><TagList tags={data.scenarios} /></div></div><div><span>实现观察</span><p>{data.implementationNotes}</p></div></div></section>
+        <section class="prose-section"><div class="section-label"><span>我的记录</span><span>NOTES / 03</span></div><div class="prose"><Content /></div></section>
+      </div>
+      <aside class="detail-sidebar">
+        <section class="sidebar-note"><span class="sidebar-label">状态</span><StatusTag status={data.status} type="component" /><p>{data.used ? '已经在真实界面中使用过。' : '先收藏，等遇到合适的界面再试。'}</p></section>
+        <section class="sidebar-note"><span class="sidebar-label">标签</span><div class="sidebar-tags"><TagList tags={data.tags} /></div></section>
+        <section class="sidebar-note"><span class="sidebar-label">来源</span><a class="source-link" href={data.source} target="_blank" rel="noreferrer">打开原始资料 <span aria-hidden="true">↗</span></a></section>
+      </aside>
+    </div>
+    <RelatedContent related={data.related} />
+  </div>
+</BaseLayout>

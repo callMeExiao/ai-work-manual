@@ -1,0 +1,79 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StatusTag from '../../components/StatusTag.astro';
+import TagList from '../../components/TagList.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import { formatDate, href } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('workflows', (entry) => import.meta.env.DEV || !entry.data.draft);
+  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const data = entry.data;
+---
+<BaseLayout title={data.title} description={data.description}>
+  <div class="detail-page page-frame workflow-detail">
+    <a class="back-link" href={href('/workflows/')}>← 返回工作流索引</a>
+    <header class="detail-header">
+      <div class="detail-overline"><span>WORKFLOW / {entry.id.slice(0, 2).toUpperCase()}</span><StatusTag status={data.status} type="workflow" /></div>
+      <h1>{data.title}</h1>
+      <p class="detail-lede">{data.description}</p>
+      <div class="detail-meta-grid">
+        <div><span>版本</span><strong>{data.version}</strong></div>
+        <div><span>最后验证</span><strong>{formatDate(data.lastVerified)}</strong></div>
+        <div><span>最近修订</span><strong>{formatDate(data.updatedAt)}</strong></div>
+        <div><span>使用工具</span><strong>{data.tools.join(' · ')}</strong></div>
+      </div>
+    </header>
+
+    <section class="workflow-brief" aria-label="工作流摘要">
+      <div><span>目标</span><p>{data.goal}</p></div>
+      <div><span>输入</span><p>{data.input}</p></div>
+      <div><span>输出</span><p>{data.output}</p></div>
+    </section>
+
+    <div class="detail-content-grid">
+      <div class="detail-main">
+        <section class="steps-section" aria-labelledby="steps-title">
+          <div class="section-label"><span>执行步骤</span><span>METHOD / 01</span></div>
+          <h2 id="steps-title">按这个顺序开始</h2>
+          <ol class="workflow-steps">
+            {data.steps.map((step, index) => <li><div class="step-number">{String(index + 1).padStart(2, '0')}</div><div class="step-copy"><h3>{step.title}</h3><p>{step.detail}</p>{step.note && <small>{step.note}</small>}</div></li>)}
+          </ol>
+        </section>
+        <section class="prompt-section" aria-labelledby="prompt-title">
+          <div class="section-label"><span>Prompt</span><span>INPUT / 02</span></div>
+          <div class="prompt-heading"><h2 id="prompt-title">可以直接复制的起点</h2><button type="button" class="copy-button" data-copy-prompt data-prompt={data.prompt}>复制 Prompt <span aria-hidden="true">⧉</span></button></div>
+          <pre class="prompt-block"><code>{data.prompt}</code></pre>
+          <p class="copy-feedback" data-copy-feedback role="status"></p>
+        </section>
+        <section class="prose-section"><div class="section-label"><span>复盘记录</span><span>NOTES / 03</span></div><div class="prose"><Content /></div></section>
+      </div>
+      <aside class="detail-sidebar">
+        <section class="sidebar-note"><span class="sidebar-label">当前状态</span><StatusTag status={data.status} type="workflow" /><p>这套流程仍在实践中，下一次验证会继续记录在这里。</p></section>
+        <section class="sidebar-note"><span class="sidebar-label">标签</span><div class="sidebar-tags"><TagList tags={data.tags} /></div></section>
+        <section class="sidebar-note"><span class="sidebar-label">版本记录</span><div class="version-line"><strong>{data.version}</strong><span>当前使用</span></div><div class="version-line muted"><strong>v1.0</strong><span>首次整理</span></div></section>
+      </aside>
+    </div>
+    <RelatedContent related={data.related} />
+  </div>
+</BaseLayout>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-prompt]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const prompt = button.dataset.prompt ?? '';
+      const feedback = document.querySelector<HTMLElement>('[data-copy-feedback]');
+      try {
+        await navigator.clipboard.writeText(prompt);
+        if (feedback) feedback.textContent = '已复制到剪贴板';
+        window.setTimeout(() => { if (feedback) feedback.textContent = ''; }, 2200);
+      } catch {
+        if (feedback) feedback.textContent = '复制失败，请手动选择文本';
+      }
+    });
+  });
+</script>

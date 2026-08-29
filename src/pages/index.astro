@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContentCard from '../components/ContentCard.astro';
+import ContentList from '../components/ContentList.astro';
+import { getVisibleCollections, formatDate, href } from '../lib/content';
+
+const { workflows, components, articles } = await getVisibleCollections();
+const sortByUpdated = (a: any, b: any) => b.data.updatedAt.valueOf() - a.data.updatedAt.valueOf();
+const recentWorkflows = [...workflows].sort(sortByUpdated).slice(0, 2);
+const featuredComponents = components.filter((entry) => entry.data.used || entry.data.status === 'used').slice(0, 2);
+const readingQueue = articles.filter((entry) => entry.data.readingStatus !== 'read').sort(sortByUpdated).slice(0, 3);
+const latestUpdate = [...workflows, ...components, ...articles].sort(sortByUpdated)[0]?.data.updatedAt;
+---
+<BaseLayout title="首页">
+  <div class="home-page page-frame">
+    <section class="home-intro">
+      <div class="intro-copy">
+        <p class="eyebrow">A LIVING WORK MANUAL / 2026</p>
+        <h1>要有 AI，<br /><em>不要重复劳动</em></h1>
+        <p class="intro-lede">在 AI 时代，记录我如何工作、思考与创造。</p>
+        <p class="intro-note">这是一本公开、持续修订的个人工作手册。这里留下正在使用的流程、值得反复观察的界面，以及读完之后仍然想回来的文章。</p>
+        <a class="primary-link" href={href('/workflows/')}>进入工作手册 <span aria-hidden="true">↗</span></a>
+      </div>
+        <div class="intro-figure" aria-label="要有 AI，不要重复劳动的工作手册索引">
+        <div class="figure-topline"><span>INDEX / 00</span><span>REV. 2.1</span></div>
+        <div class="figure-seal">旧<br />纸<br /><span>新作</span></div>
+        <div class="figure-lines"><span>WORKFLOWS</span><span>COMPONENTS</span><span>ARTICLES</span></div>
+        <div class="figure-foot">最后更新 {latestUpdate ? formatDate(latestUpdate) : '—'}</div>
+      </div>
+    </section>
+
+    <section class="stats-strip" aria-label="工作手册统计">
+      <div><strong>{workflows.length.toString().padStart(2, '0')}</strong><span>工作流</span></div>
+      <div><strong>{components.length.toString().padStart(2, '0')}</strong><span>组件收藏</span></div>
+      <div><strong>{articles.length.toString().padStart(2, '0')}</strong><span>文章笔记</span></div>
+      <div><strong>∞</strong><span>持续修订</span></div>
+    </section>
+
+    <section class="home-section workflows-preview" aria-labelledby="workflow-preview-title">
+      <div class="section-heading"><div><p class="eyebrow">01 / HOW I WORK</p><h2 id="workflow-preview-title">最近使用的工作流</h2></div><a class="section-link" href={href('/workflows/')}>查看全部 <span aria-hidden="true">↗</span></a></div>
+      <div class="home-workflow-grid">
+        {recentWorkflows.map((entry) => <ContentCard entry={entry} type="workflow" />)}
+      </div>
+    </section>
+
+    <section class="home-section components-preview" aria-labelledby="component-preview-title">
+      <div class="section-heading"><div><p class="eyebrow">02 / WHAT I KEEP</p><h2 id="component-preview-title">值得留下的组件</h2></div><a class="section-link" href={href('/components/')}>浏览组件库 <span aria-hidden="true">↗</span></a></div>
+      <div class="home-component-grid">
+        {featuredComponents.map((entry) => <ContentCard entry={entry} type="component" />)}
+      </div>
+    </section>
+
+    <section class="home-section reading-preview" aria-labelledby="reading-preview-title">
+      <div class="section-heading"><div><p class="eyebrow">03 / WORTH REVISITING</p><h2 id="reading-preview-title">当前阅读队列</h2></div><a class="section-link" href={href('/articles/')}>打开文章索引 <span aria-hidden="true">↗</span></a></div>
+      <ContentList entries={readingQueue} type="article" />
+      {readingQueue.length === 0 && <p class="empty-note">暂时没有待读文章。</p>}
+    </section>
+
+    <section class="home-closing-note">
+      <div class="closing-index">NOTE / 001</div>
+      <blockquote>收藏不是终点。<br /><em>真正留下来的，是下一次工作时仍然会用到的判断。</em></blockquote>
+      <div class="closing-mark"><span>◌</span><small>WORK IN PROGRESS</small></div>
+    </section>
+  </div>
+</BaseLayout>

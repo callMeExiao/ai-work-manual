@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentList from '../../components/ContentList.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import { getCollection } from 'astro:content';
+import { isVisible } from '../../lib/content';
+
+const allEntries = await getCollection('articles', isVisible);
+const activeTag = Astro.url.searchParams.get('tag') ?? '';
+const activeStatus = Astro.url.searchParams.get('status') ?? '';
+const entries = [...allEntries].sort((a, b) => b.data.updatedAt.valueOf() - a.data.updatedAt.valueOf());
+const tags = [...new Set(allEntries.flatMap((entry) => entry.data.tags))].sort();
+const statuses = [...new Set(allEntries.map((entry) => entry.data.readingStatus))];
+---
+<BaseLayout title="文章" description="文章阅读记录、关键观点与值得复读的个人批注。">
+  <div class="listing-page page-frame">
+    <section class="listing-hero"><div><p class="eyebrow">03 / WORTH REVISITING</p><h1>文章</h1></div><p>不是链接仓库，而是那些读完之后仍然改变了判断的内容。</p></section>
+    <div class="listing-summary"><span>{String(entries.length).padStart(2, '0')} 篇记录</span><span>摘要 · 观点 · 批注</span></div>
+    <FilterBar type="article" tags={tags} statuses={statuses} activeTag={activeTag} activeStatus={activeStatus} />
+    {entries.length ? <ContentList entries={entries} type="article" /> : <div class="empty-state"><span>∅</span><h2>没有匹配的文章</h2><p>换一个主题或状态，继续翻找。</p></div>}
+    <div class="empty-state filtered-empty-state" data-filter-empty hidden><span>∅</span><h2>没有匹配的文章</h2><p>换一个主题或状态，继续翻找。</p></div>
+  </div>
+</BaseLayout>

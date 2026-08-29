@@ -1,0 +1,20 @@
+---
+interface Props {
+  status: string;
+  type?: 'workflow' | 'component' | 'article';
+}
+
+const { status, type = 'workflow' } = Astro.props;
+const labels: Record<string, string> = {
+  active: '正在使用',
+  experimental: '实验中',
+  archived: '已归档',
+  saved: '已收藏',
+  testing: '试用中',
+  used: '已使用',
+  unread: '待读',
+  read: '已读',
+  revisit: '值得重读',
+};
+---
+<span class:list={["status-tag", `status-${status}`, `status-${type}`]}>{labels[status] ?? status}</span>

@@ -1,0 +1,76 @@
+---
+import { href } from '../lib/content';
+
+interface Props {
+  type: 'workflow' | 'component' | 'article';
+  tags: string[];
+  statuses: string[];
+  activeTag?: string;
+  activeStatus?: string;
+}
+const { type, tags, statuses, activeTag = '', activeStatus = '' } = Astro.props;
+const path = type === 'workflow' ? '/workflows/' : type === 'component' ? '/components/' : '/articles/';
+const labels: Record<string, string> = { active: '正在使用', experimental: '实验中', archived: '已归档', saved: '已收藏', testing: '试用中', used: '已使用', unread: '待读', read: '已读', revisit: '值得重读' };
+
+---
+<form class="filter-bar" method="get" action={href(path)} data-filter-form>
+  <div class="filter-group">
+    <label for={`${type}-tag`}>主题</label>
+    <select id={`${type}-tag`} name="tag">
+      <option value="">全部主题</option>
+      {tags.map((tag) => <option value={tag} selected={tag === activeTag}>{tag}</option>)}
+    </select>
+  </div>
+  <div class="filter-group">
+    <label for={`${type}-status`}>状态</label>
+    <select id={`${type}-status`} name="status">
+      <option value="">全部状态</option>
+      {statuses.map((status) => <option value={status} selected={status === activeStatus}>{labels[status] ?? status}</option>)}
+    </select>
+  </div>
+  <span class="filter-result" data-filter-result aria-live="polite"></span>
+  {(activeTag || activeStatus) && <a class="clear-filter" href={href(path)}>清除筛选 ×</a>}
+</form>
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-filter-form]').forEach((form) => {
+    const tagSelect = form.querySelector<HTMLSelectElement>('select[name="tag"]');
+    const statusSelect = form.querySelector<HTMLSelectElement>('select[name="status"]');
+    const result = form.querySelector<HTMLElement>('[data-filter-result]');
+    const emptyState = document.querySelector<HTMLElement>('[data-filter-empty]');
+    const items = Array.from(document.querySelectorAll<HTMLElement>('[data-filter-item]'));
+    const update = () => {
+      const tag = tagSelect?.value ?? '';
+      const status = statusSelect?.value ?? '';
+      let visibleCount = 0;
+      items.forEach((item) => {
+        const tags = item.dataset.filterTags?.split('|') ?? [];
+        const matches = (!tag || tags.includes(tag)) && (!status || item.dataset.filterStatus === status);
+        item.hidden = !matches;
+        if (matches) visibleCount += 1;
+      });
+      if (result) result.textContent = `${visibleCount.toString().padStart(2, '0')} 条匹配`;
+      if (emptyState) emptyState.hidden = visibleCount !== 0;
+    };
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const params = new URLSearchParams();
+      if (tagSelect?.value) params.set('tag', tagSelect.value);
+      if (statusSelect?.value) params.set('status', statusSelect.value);
+      const query = params.toString();
+      history.pushState({}, '', `${form.action}${query ? `?${query}` : ''}`);
+      update();
+    });
+    tagSelect?.addEventListener('change', () => form.requestSubmit());
+    statusSelect?.addEventListener('change', () => form.requestSubmit());
+    window.addEventListener('popstate', () => {
+      const params = new URLSearchParams(location.search);
+      if (tagSelect) tagSelect.value = params.get('tag') ?? '';
+      if (statusSelect) statusSelect.value = params.get('status') ?? '';
+      update();
+    });
+    const initialParams = new URLSearchParams(location.search);
+    if (tagSelect) tagSelect.value = initialParams.get('tag') ?? tagSelect.value;
+    if (statusSelect) statusSelect.value = initialParams.get('status') ?? statusSelect.value;
+    update();
+  });
+</script>

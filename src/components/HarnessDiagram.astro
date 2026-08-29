@@ -1,0 +1,33 @@
+---
+interface Props {
+  alt: string;
+  caption: string;
+  source: string;
+}
+
+const { alt, caption, source } = Astro.props;
+const stages = [
+  { name: 'Explore', zh: '探索', detail: '理解问题与上下文', accent: 'blue' },
+  { name: 'Planner', zh: '规划', detail: '拆解为可执行任务', accent: 'red' },
+  { name: 'Worker', zh: '执行', detail: '一次完成一个节点', accent: 'green' },
+  { name: 'Critic', zh: '审查', detail: '质疑、简化、回到实现', accent: 'red' },
+  { name: 'Promoter', zh: '交付', detail: '整理结果并让它被理解', accent: 'blue' },
+];
+---
+<figure class="harness-diagram" aria-labelledby="harness-diagram-caption">
+  <div class="harness-diagram-heading"><span>THE HARNESS / 01</span><span>WORKING LOOP</span></div>
+  <div class="harness-diagram-stage" role="img" aria-label={alt}>
+    <ol class="harness-stage-list">
+      {stages.map((stage, index) => (
+        <li class:list={["harness-stage", `accent-${stage.accent}`]}>
+          <span class="harness-stage-number">0{index + 1}</span>
+          <strong>{stage.name}</strong>
+          <em>{stage.zh}</em>
+          <small>{stage.detail}</small>
+        </li>
+      ))}
+    </ol>
+    <div class="harness-loop-note"><span>人和模型之间的工作界面</span><i aria-hidden="true">↻</i></div>
+  </div>
+  <figcaption id="harness-diagram-caption">{caption} <a href={source} target="_blank" rel="noreferrer">查看原文 ↗</a></figcaption>
+</figure>

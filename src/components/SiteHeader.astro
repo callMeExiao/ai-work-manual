@@ -1,0 +1,57 @@
+---
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const navItems = [
+  { label: '工作流', english: 'Workflows', path: '/workflows/' },
+  { label: '组件库', english: 'Components', path: '/components/' },
+  { label: '文章', english: 'Articles', path: '/articles/' },
+];
+const isActive = (path: string) => currentPath === `${base}${path}` || currentPath.startsWith(`${base}${path.slice(0, -1)}/`);
+---
+<header class="site-header">
+  <a class="brand" href={`${base}/`} aria-label="回到要有 AI，不要重复劳动首页">
+    <span class="brand-mark" aria-hidden="true">页</span>
+    <span class="brand-copy">
+      <span class="brand-name">要有 AI，不要重复劳动</span>
+      <span class="brand-subtitle">AI 工作手册</span>
+    </span>
+  </a>
+  <nav class="main-nav" aria-label="主导航">
+    {navItems.map((item) => (
+      <a class:list={["nav-link", { active: isActive(item.path) }]} href={`${base}${item.path}`} aria-current={isActive(item.path) ? 'page' : undefined}>
+        <span>{item.label}</span>
+        <small>{item.english}</small>
+      </a>
+    ))}
+  </nav>
+  <div class="header-actions">
+    <button class="search-trigger" type="button" data-open-search aria-haspopup="dialog">
+      <span aria-hidden="true">⌕</span>
+      <span class="search-label">搜索</span>
+      <kbd>⌘ K</kbd>
+    </button>
+    <button class="menu-trigger" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-nav" aria-label="打开导航菜单">☰</button>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="移动端主导航" hidden>
+    {navItems.map((item) => (
+      <a class:list={["mobile-nav-link", { active: isActive(item.path) }]} href={`${base}${item.path}`} aria-current={isActive(item.path) ? 'page' : undefined}>
+        <span>{item.label}</span><small>{item.english}</small>
+      </a>
+    ))}
+  </nav>
+</header>
+<script>
+  const menuButton = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const mobileNav = document.querySelector<HTMLElement>('#mobile-nav');
+  menuButton?.addEventListener('click', () => {
+    if (!mobileNav) return;
+    const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!isOpen));
+    menuButton.setAttribute('aria-label', isOpen ? '打开导航菜单' : '关闭导航菜单');
+    mobileNav.hidden = isOpen;
+  });
+</script>
