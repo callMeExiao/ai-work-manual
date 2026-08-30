@@ -22,13 +22,13 @@ const path = type === 'workflow' ? `/workflows/${entry.slug}/` : type === 'compo
     <h3><a href={href(path)}>{data.title}</a></h3>
     <p class="card-description">{data.description}</p>
     {type === 'workflow' && (
-      <div class="card-facts"><span><b>输入</b>{data.input}</span><span><b>输出</b>{data.output}</span></div>
+      <div class="card-facts"><span><b>输入</b>{data.input}</span><span><b>输出</b>{data.output}</span><span><b>验证</b>{formatDate(data.lastVerified)}</span></div>
     )}
     {type === 'component' && (
-      <div class="card-facts"><span><b>{data.category}</b>{data.technology.join(' / ')}</span><span><b>使用状态</b>{data.used ? '已在实践中' : '等待试用'}</span></div>
+      <div class="card-facts"><span><b>{data.category}</b>{data.technology.join(' / ')}</span><span><b>判断</b>{data.used ? '已在实践中' : '等待试用'}</span></div>
     )}
     {type === 'article' && (
-      <div class="card-facts"><span><b>{data.author}</b>{data.source}</span><span><b>更新</b>{formatDate(data.updatedAt)}</span></div>
+      <div class="card-facts"><span><b>作者</b>{data.author}</span><span><b>来源</b>{data.source}</span></div>
     )}
     <div class="card-footer">
       <TagList tags={data.tags} />

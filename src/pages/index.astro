@@ -23,7 +23,7 @@ const latestUpdate = [...workflows, ...components, ...articles].sort(sortByUpdat
       </div>
         <div class="intro-figure" aria-label="要有 AI，不要重复劳动的工作手册索引">
         <div class="figure-topline"><span>INDEX / 00</span><span>REV. 2.1</span></div>
-        <div class="figure-seal">旧<br />纸<br /><span>新作</span></div>
+        <div class="figure-seal">AI<br /><span>WORK</span></div>
         <div class="figure-lines"><span>WORKFLOWS</span><span>COMPONENTS</span><span>ARTICLES</span></div>
         <div class="figure-foot">最后更新 {latestUpdate ? formatDate(latestUpdate) : '—'}</div>
       </div>
@@ -37,21 +37,21 @@ const latestUpdate = [...workflows, ...components, ...articles].sort(sortByUpdat
     </section>
 
     <section class="home-section workflows-preview" aria-labelledby="workflow-preview-title">
-      <div class="section-heading"><div><p class="eyebrow">01 / HOW I WORK</p><h2 id="workflow-preview-title">最近使用的工作流</h2></div><a class="section-link" href={href('/workflows/')}>查看全部 <span aria-hidden="true">↗</span></a></div>
+      <div class="section-heading"><div><p class="eyebrow">01 / HOW I WORK</p><h2 id="workflow-preview-title">我如何工作</h2><p class="section-note">把有效的尝试整理成可以复查的步骤。</p></div><a class="section-link" href={href('/workflows/')}>查看全部 <span aria-hidden="true">↗</span></a></div>
       <div class="home-workflow-grid">
         {recentWorkflows.map((entry) => <ContentCard entry={entry} type="workflow" />)}
       </div>
     </section>
 
     <section class="home-section components-preview" aria-labelledby="component-preview-title">
-      <div class="section-heading"><div><p class="eyebrow">02 / WHAT I KEEP</p><h2 id="component-preview-title">值得留下的组件</h2></div><a class="section-link" href={href('/components/')}>浏览组件库 <span aria-hidden="true">↗</span></a></div>
+      <div class="section-heading"><div><p class="eyebrow">02 / WHAT I KEEP</p><h2 id="component-preview-title">我为什么留下它们</h2><p class="section-note">先观察界面如何工作，再决定是否带回自己的项目。</p></div><a class="section-link" href={href('/components/')}>浏览组件库 <span aria-hidden="true">↗</span></a></div>
       <div class="home-component-grid">
         {featuredComponents.map((entry) => <ContentCard entry={entry} type="component" />)}
       </div>
     </section>
 
     <section class="home-section reading-preview" aria-labelledby="reading-preview-title">
-      <div class="section-heading"><div><p class="eyebrow">03 / WORTH REVISITING</p><h2 id="reading-preview-title">当前阅读队列</h2></div><a class="section-link" href={href('/articles/')}>打开文章索引 <span aria-hidden="true">↗</span></a></div>
+      <div class="section-heading"><div><p class="eyebrow">03 / WORTH REVISITING</p><h2 id="reading-preview-title">哪些观点值得复读</h2><p class="section-note">留下改变过判断、仍然值得回来的文章。</p></div><a class="section-link" href={href('/articles/')}>打开文章索引 <span aria-hidden="true">↗</span></a></div>
       <ContentList entries={readingQueue} type="article" />
       {readingQueue.length === 0 && <p class="empty-note">暂时没有待读文章。</p>}
     </section>

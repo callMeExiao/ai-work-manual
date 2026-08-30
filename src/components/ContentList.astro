@@ -9,7 +9,7 @@ interface Props {
 }
 const { entries, type } = Astro.props;
 ---
-<div class:list={["content-list", `list-${type}`]}>
+<div class:list={['content-list', `list-${type}`, `index-${type}`]}>
   {entries.map((entry) => {
     const data = entry.data;
     const path = type === 'workflow' ? `/workflows/${entry.slug}/` : type === 'component' ? `/components/${entry.slug}/` : `/articles/${entry.slug}/`;
@@ -19,7 +19,7 @@ const { entries, type } = Astro.props;
           <div class="list-row-heading"><span class="list-kicker">{type === 'workflow' ? 'WORKFLOW' : type === 'component' ? 'COMPONENT' : 'ARTICLE'}</span><StatusTag status={type === 'article' ? data.readingStatus : data.status} type={type} /></div>
           <h3><a href={href(path)}>{data.title}</a></h3>
           <p>{data.description}</p>
-          <div class="list-row-meta"><TagList tags={data.tags} />{type === 'workflow' && <span>最后验证 {formatDate(data.lastVerified)}</span>}{type === 'component' && <span>{data.technology.join(' / ')}</span>}{type === 'article' && <span>{data.author} · {data.source}</span>}</div>
+          <div class="list-row-meta"><TagList tags={data.tags} />{type === 'workflow' && <span>验证于 {formatDate(data.lastVerified)}</span>}{type === 'component' && <span>技术栈 · {data.technology.join(' / ')}</span>}{type === 'article' && <span>来自 {data.source} · {data.author}</span>}</div>
         </div>
         <a class="row-arrow" href={href(path)} aria-label={`查看${data.title}`}>↗</a>
       </article>
